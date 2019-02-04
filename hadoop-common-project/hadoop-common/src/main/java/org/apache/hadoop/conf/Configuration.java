@@ -1104,6 +1104,10 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     this.allowNullValueProperties = val;
   }
 
+  public boolean getAllowNullValueProperties(){
+    return this.allowNullValueProperties;
+  }
+
   public void setRestrictSystemProps(boolean val) {
     this.restrictSystemProps = val;
   }
@@ -1228,7 +1232,46 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
   public void set(String name, String value) {
     set(name, value, null);
   }
-  
+
+  public Object getRealVal(String key, String setMethod) {
+
+    Configuration conf = new Configuration();
+    // This is ugly but should work.
+    switch (setMethod) {
+      case "set":
+        return conf.get(key);
+
+      case "setAllowNullValueProperties":
+        return conf.getAllowNullValueProperties();
+
+      case "setBoolean":
+        return conf.getBoolean(key, false);
+
+      case "setClass":
+        return conf.getClass(key, null);
+
+      case "setClassLoader":
+        return conf.getClassLoader();
+
+      case "setEnum":
+        return conf.getEnum(key, null);
+
+      case "setInt":
+        return conf.getInt(key, -256);
+
+      case "setLong":
+        return conf.getLong(key, -256);
+
+      case "setQuietMode":
+        return conf.getQuietMode();
+
+      case "setSocketAddr":
+        return conf.getSocketAddr(key, null, -256);
+
+      default:
+        return null;
+    }
+  }
   /** 
    * Set the <code>value</code> of the <code>name</code> property. If 
    * <code>name</code> is deprecated, it also sets the <code>value</code> to

@@ -1233,7 +1233,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     set(name, value, null);
   }
 
-  public Object getRealVal(String key, String setMethod) {
+  public static Object getRealVal(String key, String setMethod) {
 
     Configuration conf = new Configuration();
     // This is ugly but should work.

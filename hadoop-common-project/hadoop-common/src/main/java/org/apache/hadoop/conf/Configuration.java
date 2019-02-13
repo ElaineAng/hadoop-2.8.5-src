@@ -1236,41 +1236,55 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
   public static Object getRealVal(String key, String setMethod) {
 
     Configuration conf = new Configuration();
+    Object res;
+
     // This is ugly but should work.
     switch (setMethod) {
       case "set":
-        return conf.get(key);
+        res = conf.get(key);
+        break;
 
       case "setAllowNullValueProperties":
-        return conf.getAllowNullValueProperties();
+        res = conf.getAllowNullValueProperties();
+        break;
 
       case "setBoolean":
-        return conf.getBoolean(key, false);
+        res = conf.getBoolean(key, false);
+        break;
 
       case "setClass":
-        return conf.getClass(key, null);
+        res = conf.getClass(key, null);
+        break;
 
       case "setClassLoader":
-        return conf.getClassLoader();
+        res = conf.getClassLoader();
+        break;
 
       case "setEnum":
-        return conf.getEnum(key, null);
+        res = conf.getEnum(key, null);
+        break;
 
       case "setInt":
-        return conf.getInt(key, -256);
+        res = conf.getInt(key, -256);
+        break;
 
       case "setLong":
-        return conf.getLong(key, -256);
+        res = conf.getLong(key, -256);
+        break;
 
       case "setQuietMode":
-        return conf.getQuietMode();
+        res = conf.getQuietMode();
+        break;
 
       case "setSocketAddr":
-        return conf.getSocketAddr(key, null, -256);
+        res = conf.getSocketAddr(key, null, -256);
+        break;
 
       default:
-        return null;
+        res = null;
     }
+    System.out.println("<new>" + res);
+    return res;
   }
   /** 
    * Set the <code>value</code> of the <code>name</code> property. If 

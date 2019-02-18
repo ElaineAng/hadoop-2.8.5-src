@@ -37,23 +37,9 @@ import java.net.InetSocketAddress;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
+import java.nio.file.Files;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
@@ -730,6 +716,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
   private Properties properties;
   private Properties overlay;
   private ClassLoader classLoader;
+
   {
     classLoader = Thread.currentThread().getContextClassLoader();
     if (classLoader == null) {
@@ -1233,15 +1220,107 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     set(name, value, null);
   }
 
+  // Making it static would impose a (potentially significant) performance loss
+  // if we have lots of 'setX' calls.
+  private HashMap<String, Object> parseDefaultConfig() {
+
+    String configFile = "p.common.log";
+    ClassLoader cL = Configuration.class.getClassLoader();
+    File defaultConfig = new File(cL.getResource(configFile).getFile());
+    HashMap<String, Object> defaultValues = new HashMap<>();
+    Set<String> getX = new HashSet<>();
+    Collections.addAll(getX, "getInt", "getLong", "getDouble", "getFloat", "get", "getBoolean");
+    int stateCounter = 0;
+    String curType = null;
+    try (Scanner scanner = new Scanner(defaultConfig)) {
+      while (scanner.hasNextLine()) {
+        String line = scanner.nextLine();
+        if (stateCounter == 0 || stateCounter == 1 || stateCounter == 2) {
+          stateCounter += 1;
+          continue;
+        }
+
+        if (stateCounter == 3) {
+          String[] token = line.split(": ");
+          if (token.length >= 2) {
+            String[] funcDef = token[1].split(" ");
+            if (funcDef.length >= 2) {
+              String retType = funcDef[0];
+              String funcName = funcDef[1].split("[(]")[0];
+              if (getX.contains(funcName)) {
+                curType = retType;
+              } else {
+                curType = null;
+              }
+            }
+          }
+          stateCounter += 1;
+          continue;
+        }
+
+        if (stateCounter == 4) {
+          if (curType != null) {
+            String[] token = line.split("\\s+", 2);
+            if (token.length < 2) {
+              System.out.println("Primitive type has less than 2 value in state 4!");
+              System.exit(1);
+            }
+            String key = token[0].replaceAll("^\"|\"$", "");
+            String val = token[1].replaceAll(
+                    "\\s+", "").replaceAll(
+                            "^\"|\"$", "");
+//            System.out.println(">>> key: " + key);
+//            System.out.println(">>> val: " + val);
+//            System.out.println(curType);
+            switch (curType) {
+              case "double":
+                defaultValues.put(key, Double.parseDouble(val));
+                break;
+
+              case "java.lang.String":
+                defaultValues.put(key, val);
+                break;
+
+              case "long":
+                defaultValues.put(key, Long.parseLong(val.replaceAll("L", "")));
+                break;
+
+              case "float":
+                defaultValues.put(key, Float.parseFloat(val.replaceAll("F", "")));
+                break;
+
+              case "int":
+                defaultValues.put(key, Integer.parseInt(val));
+                break;
+
+              case "boolean":
+                boolean curBool = val.equals("0") ? false : true;
+                defaultValues.put(key, curBool);
+                break;
+            }
+          }
+        }
+        stateCounter = 0;
+        continue;
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return defaultValues;
+  }
+
   public static Object getRealVal(String key, String setMethod) {
 
     Configuration conf = new Configuration();
     Object res;
+    HashMap<String, Object> defaultValues = conf.parseDefaultConfig();
 
+    Object defaultValue = defaultValues.get(key);
     // This is ugly but should work.
     switch (setMethod) {
       case "set":
-        res = conf.get(key);
+        String defStr = defaultValue == null? null: (String) defaultValue;
+        res = conf.get(key, defStr);
         break;
 
       case "setAllowNullValueProperties":
@@ -1249,11 +1328,13 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
         break;
 
       case "setBoolean":
-        res = conf.getBoolean(key, false);
+        boolean defBool = defaultValue == null? false : (boolean) defaultValue;
+        res = conf.getBoolean(key, defBool);
         break;
 
       case "setClass":
-        res = conf.getClass(key, null);
+        Class defCls = defaultValue == null? null : (Class) defaultValue;
+        res = conf.getClass(key, defCls);
         break;
 
       case "setClassLoader":
@@ -1265,11 +1346,24 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
         break;
 
       case "setInt":
-        res = conf.getInt(key, -256);
+        int defInt = defaultValue == null? -256 : (int) defaultValue;
+        res = conf.getInt(key, defInt);
         break;
 
       case "setLong":
-        res = conf.getLong(key, -256);
+        System.out.println(defaultValue);
+        long defLong = defaultValue == null? -256 : (long) defaultValue;
+        res = conf.getLong(key, defLong);
+        break;
+
+      case "setDouble":
+        double defDouble = defaultValue == null? -256 : (double) defaultValue;
+        res = conf.getDouble(key, defDouble);
+        break;
+
+      case "setFloat":
+        float defFloat = defaultValue == null? -256: (float) defaultValue;
+        res = conf.getFloat(key, defFloat);
         break;
 
       case "setQuietMode":

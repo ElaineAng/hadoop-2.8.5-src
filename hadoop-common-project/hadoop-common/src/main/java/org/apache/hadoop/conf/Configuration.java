@@ -1072,6 +1072,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    *         or null if no such property exists.
    */
   public String get(String name) {
+    LOG.warn("CONF PARAM:" + name);  
     String[] names = handleDeprecation(deprecationContext.get(), name);
     String result = null;
     for(String n : names) {
@@ -1168,6 +1169,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    *         its replacing property and null if no such property exists.
    */
   public String getRaw(String name) {
+    LOG.warn("CONF PARAM:" + name);
     String[] names = handleDeprecation(deprecationContext.get(), name);
     String result = null;
     for(String n : names) {
@@ -1506,6 +1508,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    *         doesn't exist.                    
    */
   public String get(String name, String defaultValue) {
+    LOG.warn("CONF PARAM:" + name);
     String[] names = handleDeprecation(deprecationContext.get(), name);
     String result = null;
     for(String n : names) {
@@ -1857,6 +1860,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
   }
 
   public long[] getTimeDurations(String name, TimeUnit unit) {
+    LOG.warn("CONF PARAM:" + name);
     String[] strings = getTrimmedStrings(name);
     long[] durations = new long[strings.length];
     for (int i = 0; i < strings.length; i++) {
@@ -1919,6 +1923,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    */
   @InterfaceStability.Unstable
   public synchronized String[] getPropertySources(String name) {
+    LOG.warn("CONF PARAM:" + name);
     if (properties == null) {
       // If properties is null, it means a resource was newly added
       // but the props were cleared so as to load it upon future
@@ -2093,7 +2098,8 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    * @return a new set of ranges from the configured value
    */
   public IntegerRanges getRange(String name, String defaultValue) {
-    return new IntegerRanges(get(name, defaultValue));
+      LOG.warn("CONF PARAM:" + name);
+      return new IntegerRanges(get(name, defaultValue));
   }
 
   /** 
@@ -2236,6 +2242,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    */
   private CredentialEntry getCredentialEntry(CredentialProvider provider,
                                              String name) throws IOException {
+    LOG.warn("CONF PARAM:" + name);
     CredentialEntry entry = provider.getCredentialEntry(name);
     if (entry != null) {
       return entry;
@@ -2275,6 +2282,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    */
   public char[] getPasswordFromCredentialProviders(String name)
       throws IOException {
+    LOG.warn("CONF PARAM:" + name);
     char[] pass = null;
     try {
       List<CredentialProvider> providers =
@@ -2431,6 +2439,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    */
   public Class<?> getClassByName(String name) throws ClassNotFoundException {
     Class<?> ret = getClassByNameOrNull(name);
+    LOG.warn("CONF PARAM:" + name);
     if (ret == null) {
       throw new ClassNotFoundException("Class " + name + " not found");
     }
@@ -2522,6 +2531,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    *         or <code>defaultValue</code>. 
    */
   public Class<?> getClass(String name, Class<?> defaultValue) {
+    LOG.warn("CONF PARAM:" + name);
     String valueString = getTrimmed(name);
     if (valueString == null)
       return defaultValue;

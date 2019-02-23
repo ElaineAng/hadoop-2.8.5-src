@@ -1380,6 +1380,17 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
     System.out.println("<new>" + res);
     return res;
   }
+
+  public static void printCallingClass(){
+    for (StackTraceElement ste: Thread.currentThread().getStackTrace()){
+      String steCls = ste.getClassName();
+      String[] token = steCls.split("[.]");
+      if (token[token.length-1].startsWith("Test")){
+        System.out.println(steCls);
+        break;
+      }
+    }
+  }
   /** 
    * Set the <code>value</code> of the <code>name</code> property. If 
    * <code>name</code> is deprecated, it also sets the <code>value</code> to

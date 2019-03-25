@@ -1072,7 +1072,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    *         or null if no such property exists.
    */
   public String get(String name) {
-    LOG.warn("CONF PARAM:" + name);  
+    LOG.warn("CONF PARAM:" + name);
     String[] names = handleDeprecation(deprecationContext.get(), name);
     String result = null;
     for(String n : names) {
@@ -1509,6 +1509,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    */
   public String get(String name, String defaultValue) {
     LOG.warn("CONF PARAM:" + name);
+
     String[] names = handleDeprecation(deprecationContext.get(), name);
     String result = null;
     for(String n : names) {
@@ -2439,7 +2440,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    */
   public Class<?> getClassByName(String name) throws ClassNotFoundException {
     Class<?> ret = getClassByNameOrNull(name);
-    LOG.warn("CONF PARAM:" + name);
+
     if (ret == null) {
       throw new ClassNotFoundException("Class " + name + " not found");
     }
@@ -2455,6 +2456,7 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
    * @return the class object, or null if it could not be found.
    */
   public Class<?> getClassByNameOrNull(String name) {
+    LOG.warn("CONF PARAM:" + name);
     Map<String, WeakReference<Class<?>>> map;
     
     synchronized (CACHE_CLASSES) {

@@ -1490,15 +1490,15 @@ public class TestIPC {
     Assert.fail("didn't get limit exceeded");
   }
 
-  @Test
-  public void testUserBinding() throws Exception {
-    checkUserBinding(false);
-  }
-
-  @Test
-  public void testProxyUserBinding() throws Exception {
-    checkUserBinding(true);
-  }
+//  @Test
+//  public void testUserBinding() throws Exception {
+//    checkUserBinding(false);
+//  }
+//
+//  @Test
+//  public void testProxyUserBinding() throws Exception {
+//    checkUserBinding(true);
+//  }
 
   private void checkUserBinding(boolean asProxy) throws Exception {
     Socket s;

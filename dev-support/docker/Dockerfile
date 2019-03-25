@@ -64,6 +64,21 @@ RUN apt-get -q update && apt-get -q install --no-install-recommends -y \
     rsync \
     snappy \
     zlib1g-dev
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository ppa:jonathonf/python-3.6
+RUN apt-get -q update && apt-get install -y python3.6
+
+# setup home dir
+RUN groupadd --non-unique -g 50 elaine
+RUN useradd -g 50 -u 1000 -k /root -m elaine
+ENV HOME /home/elaine
+
+# Pull Hadoop source code
+# Does not use the mounting approach bc don't want test mess up with core-default.xml
+RUN mkdir ~/app && \
+    git clone https://github.com/ElaineAng/hadoop-2.8.5-src.git ~/app/hadoop-2.8.5-src && \
+    chown -R elaine:elaine ~/app
+
 
 # Fixing the Apache commons / Maven dependency problem under Ubuntu:
 # See http://wiki.apache.org/commons/VfsProblems
@@ -115,6 +130,7 @@ RUN apt-get -q install --no-install-recommends -y bats
 ####
 # Install pylint
 ####
+RUN pip install --upgrade pip setuptools
 RUN pip install pylint
 
 ####

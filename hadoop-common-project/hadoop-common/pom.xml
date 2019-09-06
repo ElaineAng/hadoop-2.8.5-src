@@ -414,7 +414,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <argLine>-javaagent:/home/elaine/ctest/src/cagent/target/set-agent-1.0-SNAPSHOT.jar</argLine>
+          <!--<argLine>-javaagent:/home/elaine/ctest/src/cagent/target/set-agent-1.0-SNAPSHOT.jar</argLine>-->
           <systemPropertyVariables>
             <startKdc>${startKdc}</startKdc>
             <kdc.resource.dir>${kdc.resource.dir}</kdc.resource.dir>
